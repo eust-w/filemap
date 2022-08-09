@@ -2,7 +2,7 @@ name: Go
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
 
@@ -30,9 +30,9 @@ jobs:
       with:
         tag_name: v${{steps.version.outputs.value}}
         files: |
-          pkg/gopic-linux-amd64
-          pkg/gopic-linux-arm64
-          pkg/gopic-mac-amd64
-          pkg/gopic.exe
+          pkg/filemap-linux-amd64
+          pkg/filemap-linux-arm64
+          pkg/filemap-mac-amd64
+          pkg/filemap.exe
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
