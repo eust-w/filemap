@@ -2,8 +2,8 @@ package core
 
 import (
 	"bytes"
+	"filemap/static"
 	"html/template"
-	"markdownFolderMap/static"
 	"os"
 	"path/filepath"
 )
@@ -17,11 +17,11 @@ type FolderTree struct {
 	tree   map[string]interface{}
 }
 
-func NewFolderTree(path, filter string) (FolderTree, error) {
+func NewFolderTree(path, filter string, depth int) (FolderTree, error) {
 	if value, OK := folderTreeMap[path+filter]; OK {
 		return value, nil
 	}
-	tree, err := walkMd(path, filter)
+	tree, err := walkMd(path, filter, depth)
 	if err != nil {
 		return FolderTree{}, err
 	}
@@ -38,15 +38,18 @@ func (f FolderTree) BuildHtml(temple string) (string, error) {
 	return outBytes.String(), err
 }
 
-func walkMd(path, filter string) (map[string]interface{}, error) {
+func walkMd(path, filter string, depth int) (map[string]interface{}, error) {
 	info, err := os.Stat(path)
 	if err != nil {
 		return nil, err
 	}
-	return walkMdOperator(path, filter, info)
+	return walkMdOperator(path, filter, info, depth)
 }
 
-func walkMdOperator(path, filter string, info os.FileInfo) (map[string]interface{}, error) {
+func walkMdOperator(path, filter string, info os.FileInfo, depth int) (map[string]interface{}, error) {
+	if depth == 0 {
+		return nil, nil
+	}
 	name := info.Name()
 	if name[0] == '_' || name[0] == '.' || name[0] == ' ' {
 		return nil, nil
@@ -59,7 +62,7 @@ func walkMdOperator(path, filter string, info os.FileInfo) (map[string]interface
 		for _, name := range tem {
 			localPath := filepath.Join(path, name.Name())
 			localInfo, _ := name.Info()
-			localOut, _ := walkMdOperator(localPath, filter, localInfo)
+			localOut, _ := walkMdOperator(localPath, filter, localInfo, depth-1)
 			if localOut != nil {
 				outList = append(outList, localOut)
 			}
