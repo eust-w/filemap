@@ -15,7 +15,6 @@ var path string
 var filter string
 var depth int
 
-// serverCmd represents the server command
 var serverCmd = &cobra.Command{
 	Use:   "server",
 	Short: "server",
